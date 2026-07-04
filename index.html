@@ -7,18 +7,22 @@
   <style>
     :root {
       color-scheme: light;
-      --bg: #f5f7f6;
+      --bg: #f6f7f6;
       --panel: #ffffff;
-      --ink: #17212b;
-      --muted: #66727f;
+      --ink: #18232d;
+      --muted: #65717e;
       --line: #dce3e7;
-      --soft: #f0f4f3;
+      --soft: #f1f4f3;
       --good: #2f8f68;
       --steady: #3977a8;
       --active: #d47a3c;
       --warning: #bd594d;
       --neutral: #7b8794;
-      --shadow: 0 16px 38px rgba(24, 34, 43, 0.09);
+      --deep: #2e6f9f;
+      --light: #7eb6cc;
+      --rem: #8b73b7;
+      --awake: #d49a2d;
+      --shadow: 0 14px 34px rgba(24, 34, 43, 0.08);
     }
 
     * {
@@ -30,32 +34,33 @@
       background: var(--bg);
       color: var(--ink);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-      line-height: 1.45;
+      line-height: 1.42;
     }
 
     .page {
-      width: min(920px, calc(100% - 28px));
+      width: min(880px, calc(100% - 24px));
       margin: 0 auto;
-      padding: 24px 0 38px;
+      padding: 20px 0 36px;
     }
 
     header {
       display: flex;
       justify-content: space-between;
+      gap: 12px;
       align-items: flex-end;
-      gap: 14px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
     h1 {
       margin: 0;
-      font-size: 28px;
-      line-height: 1.1;
+      font-size: 26px;
+      line-height: 1.12;
       font-weight: 760;
       letter-spacing: 0;
     }
 
-    .subtle {
+    .subtle,
+    .meta {
       color: var(--muted);
       font-size: 13px;
     }
@@ -63,9 +68,8 @@
     .actions {
       display: flex;
       gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
       justify-content: flex-end;
+      flex-wrap: wrap;
     }
 
     button,
@@ -74,12 +78,13 @@
     }
 
     button {
+      min-height: 34px;
       border: 1px solid var(--line);
-      background: #fff;
-      color: var(--ink);
       border-radius: 8px;
-      min-height: 38px;
-      padding: 0 12px;
+      background: var(--panel);
+      color: var(--ink);
+      padding: 0 10px;
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
     }
@@ -97,8 +102,8 @@
 
     .token-panel {
       display: none;
-      margin-bottom: 14px;
-      padding: 14px;
+      margin-bottom: 12px;
+      padding: 12px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: var(--panel);
@@ -113,31 +118,24 @@
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto auto;
       gap: 8px;
-      margin-top: 10px;
+      margin-top: 9px;
     }
 
     input {
       width: 100%;
+      min-height: 36px;
       border: 1px solid var(--line);
       border-radius: 8px;
-      min-height: 38px;
       padding: 0 10px;
       color: var(--ink);
       background: #fff;
     }
 
     .status-line {
-      min-height: 22px;
-      margin: 8px 0 14px;
+      min-height: 20px;
+      margin: 6px 0 12px;
       color: var(--muted);
       font-size: 13px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(310px, 0.9fr);
-      gap: 14px;
-      align-items: start;
     }
 
     .panel {
@@ -151,9 +149,9 @@
     .panel-head {
       display: flex;
       justify-content: space-between;
-      gap: 12px;
       align-items: baseline;
-      padding: 16px 16px 0;
+      gap: 12px;
+      padding: 15px 16px 0;
     }
 
     h2 {
@@ -163,138 +161,84 @@
       letter-spacing: 0;
     }
 
-    .panel-body {
-      padding: 14px 16px 16px;
-    }
-
-    .today-status {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-
-    .dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: var(--neutral);
-      box-shadow: 0 0 0 5px rgba(123, 135, 148, 0.14);
-      flex: 0 0 auto;
-    }
-
-    .dot.good {
-      background: var(--good);
-      box-shadow: 0 0 0 5px rgba(47, 143, 104, 0.16);
-    }
-
-    .dot.steady {
-      background: var(--steady);
-      box-shadow: 0 0 0 5px rgba(57, 119, 168, 0.15);
-    }
-
-    .dot.active {
-      background: var(--active);
-      box-shadow: 0 0 0 5px rgba(212, 122, 60, 0.16);
-    }
-
-    .dot.warning {
-      background: var(--warning);
-      box-shadow: 0 0 0 5px rgba(189, 89, 77, 0.16);
-    }
-
-    .status-title {
-      font-size: 22px;
-      line-height: 1.2;
-      font-weight: 780;
-    }
-
-    .headline {
-      margin: 0 0 14px;
-      color: var(--muted);
-      font-size: 15px;
-    }
-
-    .metrics {
+    .summary-strip {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-      margin-bottom: 14px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      padding: 12px 16px 14px;
+      border-bottom: 1px solid var(--line);
     }
 
-    .metric {
-      min-height: 82px;
+    .summary-item {
+      min-height: 56px;
       border: 1px solid var(--line);
       border-radius: 8px;
-      padding: 11px;
+      padding: 8px 10px;
       background: #fbfcfc;
     }
 
+    .summary-label,
     .metric-label,
-    .record-meta,
-    .day-meta {
+    .activity-label {
       color: var(--muted);
       font-size: 12px;
-      font-weight: 650;
-    }
-
-    .metric-value {
-      margin-top: 5px;
-      font-size: 21px;
-      font-weight: 780;
-      line-height: 1.15;
-    }
-
-    .metric-note {
-      margin-top: 5px;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .advice {
-      display: grid;
-      gap: 7px;
-      padding: 0;
-      margin: 0 0 14px;
-      list-style: none;
-    }
-
-    .advice li {
-      min-height: 32px;
-      display: flex;
-      align-items: center;
-      border-radius: 8px;
-      padding: 7px 10px;
-      background: #eef5f2;
-      color: #255944;
-      font-size: 14px;
       font-weight: 700;
     }
 
-    .recent {
-      display: grid;
-      gap: 8px;
+    .summary-value {
+      margin-top: 4px;
+      font-size: 17px;
+      line-height: 1.15;
+      font-weight: 760;
     }
 
-    .day-row {
+    .day-list {
       display: grid;
-      grid-template-columns: 48px 74px minmax(0, 1fr);
-      gap: 8px;
-      align-items: center;
-      min-height: 34px;
-      padding: 7px 9px;
+      gap: 12px;
+      padding: 14px 16px 16px;
+    }
+
+    .day-card {
+      border: 1px solid var(--line);
       border-radius: 8px;
-      background: var(--soft);
+      background: #fbfcfc;
+      overflow: hidden;
+    }
+
+    .day-card.latest {
+      background: #fff;
+      border-color: #cdd8df;
+    }
+
+    .day-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 12px 12px 0;
+    }
+
+    .day-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .day-date {
+      font-size: 17px;
+      font-weight: 780;
+      line-height: 1.2;
     }
 
     .badge {
-      justify-self: start;
       border-radius: 999px;
       padding: 3px 8px;
+      color: #4d5965;
+      background: #e4e9ed;
       font-size: 12px;
       font-weight: 760;
-      color: #485563;
-      background: #e4e9ed;
+      white-space: nowrap;
     }
 
     .badge.good {
@@ -317,60 +261,187 @@
       background: #f0d5d2;
     }
 
-    .record-list {
-      display: grid;
-      gap: 10px;
+    .headline {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 13px;
     }
 
-    .record {
-      border: 1px solid var(--line);
-      border-radius: 8px;
+    .day-body {
       padding: 12px;
-      background: #fbfcfc;
-    }
-
-    .record-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 8px;
-    }
-
-    .record-title {
-      font-weight: 780;
-      font-size: 16px;
-    }
-
-    .record-stats {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 8px;
     }
 
-    .record-stat {
+    .metric {
+      min-height: 72px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 9px;
+      background: #fff;
+    }
+
+    .metric-value {
+      margin-top: 4px;
+      font-size: 16px;
+      line-height: 1.18;
+      font-weight: 760;
+    }
+
+    .metric-note {
+      margin-top: 4px;
       color: var(--muted);
       font-size: 12px;
     }
 
-    .record-stat strong {
-      display: block;
-      color: var(--ink);
-      font-size: 15px;
+    .sleep-stage {
+      display: grid;
+      gap: 6px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 9px;
+      background: #fff;
+    }
+
+    .stage-bar {
+      display: flex;
+      height: 12px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: var(--soft);
+    }
+
+    .stage-segment {
+      min-width: 2px;
+    }
+
+    .stage-segment.deep {
+      background: var(--deep);
+    }
+
+    .stage-segment.light {
+      background: var(--light);
+    }
+
+    .stage-segment.rem {
+      background: var(--rem);
+    }
+
+    .stage-segment.awake {
+      background: var(--awake);
+    }
+
+    .stage-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .stage-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 3px;
+      margin-right: 5px;
+      vertical-align: 1px;
+      background: var(--neutral);
+    }
+
+    .stage-dot.deep {
+      background: var(--deep);
+    }
+
+    .stage-dot.light {
+      background: var(--light);
+    }
+
+    .stage-dot.rem {
+      background: var(--rem);
+    }
+
+    .stage-dot.awake {
+      background: var(--awake);
+    }
+
+    .activity-section {
+      display: grid;
+      gap: 8px;
+    }
+
+    .section-title {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 760;
+    }
+
+    .activity-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fff;
+    }
+
+    .activity-top {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .activity-title {
+      font-size: 16px;
+      font-weight: 780;
       line-height: 1.2;
+    }
+
+    .activity-type {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .activity-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 7px;
+    }
+
+    .activity-stat {
+      min-height: 46px;
+      border-radius: 7px;
+      background: var(--soft);
+      padding: 7px;
+    }
+
+    .activity-value {
+      margin-top: 2px;
+      font-size: 14px;
+      font-weight: 760;
+      line-height: 1.18;
     }
 
     .empty {
       color: var(--muted);
-      background: var(--soft);
       border-radius: 8px;
-      padding: 12px;
+      background: var(--soft);
+      padding: 10px;
+      font-size: 13px;
     }
 
     @media (max-width: 760px) {
       .page {
         width: min(100% - 20px, 620px);
-        padding-top: 18px;
+        padding-top: 16px;
       }
 
       header {
@@ -382,14 +453,31 @@
         margin-top: 10px;
       }
 
-      .grid,
       .token-row,
-      .metrics {
-        grid-template-columns: 1fr;
+      .summary-strip,
+      .metric-grid,
+      .activity-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .day-top {
+        display: block;
+      }
+
+      .day-top .meta {
+        margin-top: 6px;
       }
 
       h1 {
-        font-size: 25px;
+        font-size: 24px;
+      }
+    }
+
+    @media (max-width: 460px) {
+      .summary-strip,
+      .metric-grid,
+      .activity-grid {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -399,10 +487,10 @@
     <header>
       <div>
         <h1>健康状态</h1>
-        <div class="subtle" id="rangeText"></div>
+        <div class="subtle" id="rangeText">每天早晨更新</div>
       </div>
       <div class="actions">
-        <button id="refreshButton" type="button">刷新</button>
+        <button id="refreshButton" type="button">重新读取</button>
         <button id="tokenToggleButton" type="button">Token</button>
       </div>
     </header>
@@ -418,37 +506,14 @@
 
     <div class="status-line" id="statusLine"></div>
 
-    <div class="grid" id="content" hidden>
-      <section class="panel" aria-label="每日状态">
-        <div class="panel-head">
-          <h2>每日状态</h2>
-          <div class="subtle" id="updatedText"></div>
-        </div>
-        <div class="panel-body">
-          <div class="today-status">
-            <span class="dot" id="statusDot"></span>
-            <div>
-              <div class="status-title" id="statusTitle"></div>
-              <div class="subtle" id="statusDate"></div>
-            </div>
-          </div>
-          <p class="headline" id="headline"></p>
-          <div class="metrics" id="metrics"></div>
-          <ul class="advice" id="advice"></ul>
-          <div class="recent" id="recentDays"></div>
-        </div>
-      </section>
-
-      <section class="panel" aria-label="运动记录">
-        <div class="panel-head">
-          <h2>运动记录</h2>
-          <div class="subtle" id="recordCount"></div>
-        </div>
-        <div class="panel-body">
-          <div class="record-list" id="recordList"></div>
-        </div>
-      </section>
-    </div>
+    <section class="panel" id="content" aria-label="每日状态" hidden>
+      <div class="panel-head">
+        <h2>每日状态</h2>
+        <div class="meta" id="updatedText"></div>
+      </div>
+      <div class="summary-strip" id="summaryStrip"></div>
+      <div class="day-list" id="dayList"></div>
+    </section>
   </main>
 
   <script>
@@ -471,15 +536,8 @@
       content: document.getElementById("content"),
       rangeText: document.getElementById("rangeText"),
       updatedText: document.getElementById("updatedText"),
-      statusDot: document.getElementById("statusDot"),
-      statusTitle: document.getElementById("statusTitle"),
-      statusDate: document.getElementById("statusDate"),
-      headline: document.getElementById("headline"),
-      metrics: document.getElementById("metrics"),
-      advice: document.getElementById("advice"),
-      recentDays: document.getElementById("recentDays"),
-      recordCount: document.getElementById("recordCount"),
-      recordList: document.getElementById("recordList")
+      summaryStrip: document.getElementById("summaryStrip"),
+      dayList: document.getElementById("dayList")
     };
 
     function escapeHtml(value) {
@@ -547,70 +605,120 @@
       return parsed;
     }
 
-    function renderMetrics(items) {
-      els.metrics.innerHTML = items.map(function (item) {
-        return '<div class="metric">' +
-          '<div class="metric-label">' + escapeHtml(item.label) + '</div>' +
-          '<div class="metric-value">' + escapeHtml(item.value) + '</div>' +
-          '<div class="metric-note">' + escapeHtml(item.note) + '</div>' +
+    function renderSummary(data) {
+      const totals = data.totals || {};
+      const items = [
+        ["平均睡眠", totals.avgSleepText],
+        ["日均步数", totals.avgStepsText],
+        ["运动时间", totals.exerciseText],
+        ["运动记录", (totals.activityCount || 0) + " 条"]
+      ];
+      els.summaryStrip.innerHTML = items.map(function (item) {
+        return '<div class="summary-item">' +
+          '<div class="summary-label">' + escapeHtml(item[0]) + '</div>' +
+          '<div class="summary-value">' + escapeHtml(item[1] || "暂无") + '</div>' +
           '</div>';
       }).join("");
     }
 
-    function renderAdvice(items) {
-      els.advice.innerHTML = items.map(function (item) {
-        return "<li>" + escapeHtml(item) + "</li>";
+    function renderStages(stages) {
+      if (!stages || !stages.length) {
+        return '<div class="empty">暂无睡眠成分。</div>';
+      }
+      const segments = stages.map(function (stage) {
+        return '<span class="stage-segment ' + escapeHtml(stage.key) + '" style="width:' + Math.max(stage.percent, 1) + '%"></span>';
       }).join("");
+      const legend = stages.map(function (stage) {
+        return '<span><span class="stage-dot ' + escapeHtml(stage.key) + '"></span>' + escapeHtml(stage.label) + ' ' + escapeHtml(stage.percent) + '%</span>';
+      }).join("");
+      return '<div class="sleep-stage">' +
+        '<div class="stage-bar">' + segments + '</div>' +
+        '<div class="stage-legend">' + legend + '</div>' +
+        '</div>';
     }
 
-    function renderRecentDays(days) {
-      els.recentDays.innerHTML = days.slice().reverse().map(function (day) {
-        const cls = toneClass(day.status && day.status.tone);
-        const detail = day.sleepText + " · " + day.stepsText + " · " + day.exerciseText;
-        return '<div class="day-row">' +
-          '<div class="day-meta">' + escapeHtml(day.label) + '</div>' +
-          '<div class="badge ' + cls + '">' + escapeHtml(day.status.label) + '</div>' +
-          '<div class="day-meta">' + escapeHtml(detail) + '</div>' +
-          '</div>';
-      }).join("");
+    function renderMetric(label, value, note) {
+      return '<div class="metric">' +
+        '<div class="metric-label">' + escapeHtml(label) + '</div>' +
+        '<div class="metric-value">' + escapeHtml(value) + '</div>' +
+        '<div class="metric-note">' + escapeHtml(note || "") + '</div>' +
+        '</div>';
     }
 
-    function renderRecords(records) {
-      els.recordCount.textContent = records.length ? records.length + " 条" : "";
-      if (!records.length) {
-        els.recordList.innerHTML = '<div class="empty">近两周没有单独运动记录。</div>';
-        return;
+    function renderActivityStat(label, value) {
+      return '<div class="activity-stat">' +
+        '<div class="activity-label">' + escapeHtml(label) + '</div>' +
+        '<div class="activity-value">' + escapeHtml(value) + '</div>' +
+        '</div>';
+    }
+
+    function renderActivities(day) {
+      if (!day.activities || !day.activities.length) {
+        return '<div class="activity-section"><div class="section-title">运动记录</div><div class="empty">这一天没有单独运动记录。</div></div>';
       }
 
-      els.recordList.innerHTML = records.map(function (record) {
-        return '<article class="record">' +
-          '<div class="record-top">' +
-            '<div class="record-title">' + escapeHtml(record.type) + '</div>' +
-            '<div class="record-meta">' + escapeHtml(record.label) + '</div>' +
+      const records = day.activities.map(function (activity) {
+        const stats = [
+          ["时长", activity.durationText],
+          ["距离", activity.distanceText],
+          ["负荷", activity.trainingLoadText],
+          ["体感", activity.perceivedEffortText],
+          ["平均心率", activity.avgHeartRateText],
+          ["爬升/下降", activity.elevationText],
+          ["消耗", activity.caloriesText],
+          ["训练效果", activity.trainingEffectText]
+        ].map(function (item) {
+          return renderActivityStat(item[0], item[1] || "暂无");
+        }).join("");
+
+        return '<article class="activity-card">' +
+          '<div class="activity-top">' +
+            '<div class="activity-title">' + escapeHtml(activity.title) + '</div>' +
+            '<div class="activity-type">' + escapeHtml(activity.type) + '</div>' +
           '</div>' +
-          '<div class="record-stats">' +
-            '<div class="record-stat">时长<strong>' + escapeHtml(record.durationText) + '</strong></div>' +
-            '<div class="record-stat">距离<strong>' + escapeHtml(record.distanceText) + '</strong></div>' +
-            '<div class="record-stat">消耗<strong>' + escapeHtml(record.caloriesText) + '</strong></div>' +
-          '</div>' +
+          '<div class="activity-grid">' + stats + '</div>' +
           '</article>';
       }).join("");
+
+      return '<div class="activity-section"><div class="section-title">运动记录</div>' + records + '</div>';
+    }
+
+    function renderDay(day, index) {
+      const cls = toneClass(day.status && day.status.tone);
+      const latestClass = index === 0 ? " latest" : "";
+      const metrics = [
+        renderMetric("睡眠", day.sleep.durationText, (day.sleep.window || "暂无睡眠时间") + " · " + day.sleep.scoreText + " · " + day.sleep.awakeText + " · 午睡 " + (day.sleep.napText || "暂无")),
+        renderMetric("HRV", day.vitals.hrvText, day.vitals.hrvNote || "睡眠 HRV"),
+        renderMetric("静息心率", day.vitals.restingText, "恢复 " + day.vitals.recoveryText + " · 负荷比 " + day.vitals.loadRatioText),
+        renderMetric("日间活动", day.activity.stepsText, day.activity.exerciseText + " · " + day.activity.activeCaloriesText)
+      ].join("");
+
+      return '<article class="day-card' + latestClass + '">' +
+        '<div class="day-top">' +
+          '<div>' +
+            '<div class="day-title">' +
+              '<span class="day-date">' + escapeHtml(day.label) + '</span>' +
+              '<span class="badge ' + cls + '">' + escapeHtml(day.status.label) + '</span>' +
+            '</div>' +
+            '<div class="headline">' + escapeHtml(day.status.headline) + '</div>' +
+          '</div>' +
+          '<div class="meta">' + escapeHtml(day.date) + '</div>' +
+        '</div>' +
+        '<div class="day-body">' +
+          '<div class="metric-grid">' + metrics + '</div>' +
+          renderStages(day.sleep.stages) +
+          renderActivities(day) +
+        '</div>' +
+        '</article>';
     }
 
     function render(data) {
-      const latest = data.latest;
-      const cls = toneClass(latest.status && latest.status.tone);
+      const days = data.days || [];
       els.content.hidden = false;
-      els.rangeText.textContent = data.dateRange.label + " · " + data.totals.dayCount + " 天";
-      els.updatedText.textContent = formatDateTime(data.generatedAt);
-      els.statusDot.className = "dot " + cls;
-      els.statusTitle.textContent = latest.status.label;
-      els.statusDate.textContent = latest.date + (latest.partial ? " · 更新中" : "");
-      els.headline.textContent = latest.headline;
-      renderMetrics(latest.items || []);
-      renderAdvice(latest.advice || []);
-      renderRecentDays(data.recentDays || []);
-      renderRecords(data.activityRecords || []);
+      els.rangeText.textContent = (data.updateCadence || "每天早晨更新") + " · " + data.dateRange.label;
+      els.updatedText.textContent = "生成于 " + formatDateTime(data.generatedAt);
+      renderSummary(data);
+      els.dayList.innerHTML = days.map(renderDay).join("");
     }
 
     async function load() {
@@ -624,7 +732,7 @@
 
       try {
         setBusy(true);
-        els.statusLine.textContent = "正在读取最新数据...";
+        els.statusLine.textContent = "正在读取数据...";
         const data = await fetchHealthData(token);
         render(data);
         els.statusLine.textContent = "";
