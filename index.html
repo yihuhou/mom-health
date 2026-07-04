@@ -261,6 +261,11 @@
       background: #f0d5d2;
     }
 
+    .badge.period {
+      color: #7a3f5d;
+      background: #f1dce8;
+    }
+
     .headline {
       margin-top: 4px;
       color: var(--muted);
@@ -687,6 +692,9 @@
     function renderDay(day, index) {
       const cls = toneClass(day.status && day.status.tone);
       const latestClass = index === 0 ? " latest" : "";
+      const extraBadge = day.menstrualTag
+        ? '<span class="badge period">' + escapeHtml(day.menstrualTag.label) + '</span>'
+        : "";
       const metrics = [
         renderMetric("睡眠", day.sleep.durationText, (day.sleep.window || "暂无睡眠时间") + " · " + day.sleep.scoreText + " · " + day.sleep.awakeText + " · 午睡 " + (day.sleep.napText || "暂无")),
         renderMetric("HRV", day.vitals.hrvText, day.vitals.hrvNote || "睡眠 HRV"),
@@ -700,6 +708,7 @@
             '<div class="day-title">' +
               '<span class="day-date">' + escapeHtml(day.label) + '</span>' +
               '<span class="badge ' + cls + '">' + escapeHtml(day.status.label) + '</span>' +
+              extraBadge +
             '</div>' +
             '<div class="headline">' + escapeHtml(day.status.headline) + '</div>' +
           '</div>' +
