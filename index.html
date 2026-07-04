@@ -582,11 +582,13 @@
     }
 
     async function fetchHealthData(token) {
-      const url = "https://api.github.com/repos/" + CONFIG.owner + "/" + CONFIG.repo + "/contents/" + encodeURIComponent(CONFIG.path) + "?ref=" + encodeURIComponent(CONFIG.ref);
+      const url = "https://api.github.com/repos/" + CONFIG.owner + "/" + CONFIG.repo + "/contents/" + encodeURIComponent(CONFIG.path) + "?ref=" + encodeURIComponent(CONFIG.ref) + "&_=" + Date.now();
       const response = await fetch(url, {
+        cache: "no-store",
         headers: {
           "Accept": "application/vnd.github.raw+json",
           "Authorization": "Bearer " + token,
+          "Cache-Control": "no-cache",
           "X-GitHub-Api-Version": "2022-11-28"
         }
       });
@@ -714,6 +716,11 @@
 
     function render(data) {
       const days = data.days || [];
+      if (!Array.isArray(days) || !days.length) {
+        els.content.hidden = true;
+        els.statusLine.textContent = "读到了旧版数据，请点重新读取或稍后刷新。";
+        return;
+      }
       els.content.hidden = false;
       els.rangeText.textContent = (data.updateCadence || "每天早晨更新") + " · " + data.dateRange.label;
       els.updatedText.textContent = "生成于 " + formatDateTime(data.generatedAt);
