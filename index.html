@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>健康状态</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7f6;
+      --panel: #ffffff;
+      --ink: #17212b;
+      --muted: #66727f;
+      --line: #dce3e7;
+      --soft: #f0f4f3;
+      --good: #2f8f68;
+      --steady: #3977a8;
+      --active: #d47a3c;
+      --warning: #bd594d;
+      --neutral: #7b8794;
+      --shadow: 0 16px 38px rgba(24, 34, 43, 0.09);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      line-height: 1.45;
+    }
+
+    .page {
+      width: min(920px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 24px 0 38px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.1;
+      font-weight: 760;
+      letter-spacing: 0;
+    }
+
+    .subtle {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 8px;
+      min-height: 38px;
+      padding: 0 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button.primary {
+      border-color: #1f6f54;
+      background: #1f6f54;
+      color: #fff;
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: default;
+    }
+
+    .token-panel {
+      display: none;
+      margin-bottom: 14px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .token-panel.visible {
+      display: block;
+    }
+
+    .token-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      min-height: 38px;
+      padding: 0 10px;
+      color: var(--ink);
+      background: #fff;
+    }
+
+    .status-line {
+      min-height: 22px;
+      margin: 8px 0 14px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(310px, 0.9fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: baseline;
+      padding: 16px 16px 0;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 760;
+      letter-spacing: 0;
+    }
+
+    .panel-body {
+      padding: 14px 16px 16px;
+    }
+
+    .today-status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--neutral);
+      box-shadow: 0 0 0 5px rgba(123, 135, 148, 0.14);
+      flex: 0 0 auto;
+    }
+
+    .dot.good {
+      background: var(--good);
+      box-shadow: 0 0 0 5px rgba(47, 143, 104, 0.16);
+    }
+
+    .dot.steady {
+      background: var(--steady);
+      box-shadow: 0 0 0 5px rgba(57, 119, 168, 0.15);
+    }
+
+    .dot.active {
+      background: var(--active);
+      box-shadow: 0 0 0 5px rgba(212, 122, 60, 0.16);
+    }
+
+    .dot.warning {
+      background: var(--warning);
+      box-shadow: 0 0 0 5px rgba(189, 89, 77, 0.16);
+    }
+
+    .status-title {
+      font-size: 22px;
+      line-height: 1.2;
+      font-weight: 780;
+    }
+
+    .headline {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .metric {
+      min-height: 82px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 11px;
+      background: #fbfcfc;
+    }
+
+    .metric-label,
+    .record-meta,
+    .day-meta {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .metric-value {
+      margin-top: 5px;
+      font-size: 21px;
+      font-weight: 780;
+      line-height: 1.15;
+    }
+
+    .metric-note {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .advice {
+      display: grid;
+      gap: 7px;
+      padding: 0;
+      margin: 0 0 14px;
+      list-style: none;
+    }
+
+    .advice li {
+      min-height: 32px;
+      display: flex;
+      align-items: center;
+      border-radius: 8px;
+      padding: 7px 10px;
+      background: #eef5f2;
+      color: #255944;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .recent {
+      display: grid;
+      gap: 8px;
+    }
+
+    .day-row {
+      display: grid;
+      grid-template-columns: 48px 74px minmax(0, 1fr);
+      gap: 8px;
+      align-items: center;
+      min-height: 34px;
+      padding: 7px 9px;
+      border-radius: 8px;
+      background: var(--soft);
+    }
+
+    .badge {
+      justify-self: start;
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 12px;
+      font-weight: 760;
+      color: #485563;
+      background: #e4e9ed;
+    }
+
+    .badge.good {
+      color: #226044;
+      background: #dcefe6;
+    }
+
+    .badge.steady {
+      color: #285b84;
+      background: #dfeaf3;
+    }
+
+    .badge.active {
+      color: #82481f;
+      background: #f1dccb;
+    }
+
+    .badge.warning {
+      color: #7d332d;
+      background: #f0d5d2;
+    }
+
+    .record-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .record {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fbfcfc;
+    }
+
+    .record-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .record-title {
+      font-weight: 780;
+      font-size: 16px;
+    }
+
+    .record-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .record-stat {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .record-stat strong {
+      display: block;
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.2;
+    }
+
+    .empty {
+      color: var(--muted);
+      background: var(--soft);
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    @media (max-width: 760px) {
+      .page {
+        width: min(100% - 20px, 620px);
+        padding-top: 18px;
+      }
+
+      header {
+        display: block;
+      }
+
+      .actions {
+        justify-content: flex-start;
+        margin-top: 10px;
+      }
+
+      .grid,
+      .token-row,
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 25px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <div>
+        <h1>健康状态</h1>
+        <div class="subtle" id="rangeText"></div>
+      </div>
+      <div class="actions">
+        <button id="refreshButton" type="button">刷新</button>
+        <button id="tokenToggleButton" type="button">Token</button>
+      </div>
+    </header>
+
+    <section class="token-panel" id="tokenPanel">
+      <div class="subtle">Token 只保存在这个浏览器里，用来读取私有数据仓库。</div>
+      <div class="token-row">
+        <input id="tokenInput" type="password" autocomplete="off" placeholder="GitHub fine-grained token">
+        <button class="primary" id="saveTokenButton" type="button">保存</button>
+        <button id="clearTokenButton" type="button">清除</button>
+      </div>
+    </section>
+
+    <div class="status-line" id="statusLine"></div>
+
+    <div class="grid" id="content" hidden>
+      <section class="panel" aria-label="每日状态">
+        <div class="panel-head">
+          <h2>每日状态</h2>
+          <div class="subtle" id="updatedText"></div>
+        </div>
+        <div class="panel-body">
+          <div class="today-status">
+            <span class="dot" id="statusDot"></span>
+            <div>
+              <div class="status-title" id="statusTitle"></div>
+              <div class="subtle" id="statusDate"></div>
+            </div>
+          </div>
+          <p class="headline" id="headline"></p>
+          <div class="metrics" id="metrics"></div>
+          <ul class="advice" id="advice"></ul>
+          <div class="recent" id="recentDays"></div>
+        </div>
+      </section>
+
+      <section class="panel" aria-label="运动记录">
+        <div class="panel-head">
+          <h2>运动记录</h2>
+          <div class="subtle" id="recordCount"></div>
+        </div>
+        <div class="panel-body">
+          <div class="record-list" id="recordList"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const CONFIG = {
+      owner: "yihuhou",
+      repo: "mom-health-data",
+      path: "mom-health-summary.json",
+      ref: "main"
+    };
+    const TOKEN_KEY = "mom-health.github-token.v1";
+
+    const els = {
+      tokenPanel: document.getElementById("tokenPanel"),
+      tokenInput: document.getElementById("tokenInput"),
+      saveTokenButton: document.getElementById("saveTokenButton"),
+      clearTokenButton: document.getElementById("clearTokenButton"),
+      tokenToggleButton: document.getElementById("tokenToggleButton"),
+      refreshButton: document.getElementById("refreshButton"),
+      statusLine: document.getElementById("statusLine"),
+      content: document.getElementById("content"),
+      rangeText: document.getElementById("rangeText"),
+      updatedText: document.getElementById("updatedText"),
+      statusDot: document.getElementById("statusDot"),
+      statusTitle: document.getElementById("statusTitle"),
+      statusDate: document.getElementById("statusDate"),
+      headline: document.getElementById("headline"),
+      metrics: document.getElementById("metrics"),
+      advice: document.getElementById("advice"),
+      recentDays: document.getElementById("recentDays"),
+      recordCount: document.getElementById("recordCount"),
+      recordList: document.getElementById("recordList")
+    };
+
+    function escapeHtml(value) {
+      return String(value == null ? "" : value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function toneClass(tone) {
+      return ["good", "steady", "active", "warning"].includes(tone) ? tone : "";
+    }
+
+    function formatDateTime(value) {
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "";
+      return new Intl.DateTimeFormat("zh-CN", {
+        month: "numeric",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+      }).format(date);
+    }
+
+    function getStoredToken() {
+      return localStorage.getItem(TOKEN_KEY) || "";
+    }
+
+    function setBusy(isBusy) {
+      els.refreshButton.disabled = isBusy;
+      els.saveTokenButton.disabled = isBusy;
+    }
+
+    function showTokenPanel(show) {
+      els.tokenPanel.classList.toggle("visible", show);
+      if (show) {
+        els.tokenInput.value = getStoredToken();
+        window.setTimeout(function () { els.tokenInput.focus(); }, 0);
+      }
+    }
+
+    async function fetchHealthData(token) {
+      const url = "https://api.github.com/repos/" + CONFIG.owner + "/" + CONFIG.repo + "/contents/" + encodeURIComponent(CONFIG.path) + "?ref=" + encodeURIComponent(CONFIG.ref);
+      const response = await fetch(url, {
+        headers: {
+          "Accept": "application/vnd.github.raw+json",
+          "Authorization": "Bearer " + token,
+          "X-GitHub-Api-Version": "2022-11-28"
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error("GitHub 返回 " + response.status);
+      }
+
+      const text = await response.text();
+      const parsed = JSON.parse(text);
+      if (parsed && parsed.encoding === "base64" && parsed.content) {
+        const binary = atob(parsed.content.replace(/\s/g, ""));
+        const bytes = Uint8Array.from(binary, function (char) { return char.charCodeAt(0); });
+        return JSON.parse(new TextDecoder("utf-8").decode(bytes));
+      }
+      return parsed;
+    }
+
+    function renderMetrics(items) {
+      els.metrics.innerHTML = items.map(function (item) {
+        return '<div class="metric">' +
+          '<div class="metric-label">' + escapeHtml(item.label) + '</div>' +
+          '<div class="metric-value">' + escapeHtml(item.value) + '</div>' +
+          '<div class="metric-note">' + escapeHtml(item.note) + '</div>' +
+          '</div>';
+      }).join("");
+    }
+
+    function renderAdvice(items) {
+      els.advice.innerHTML = items.map(function (item) {
+        return "<li>" + escapeHtml(item) + "</li>";
+      }).join("");
+    }
+
+    function renderRecentDays(days) {
+      els.recentDays.innerHTML = days.slice().reverse().map(function (day) {
+        const cls = toneClass(day.status && day.status.tone);
+        const detail = day.sleepText + " · " + day.stepsText + " · " + day.exerciseText;
+        return '<div class="day-row">' +
+          '<div class="day-meta">' + escapeHtml(day.label) + '</div>' +
+          '<div class="badge ' + cls + '">' + escapeHtml(day.status.label) + '</div>' +
+          '<div class="day-meta">' + escapeHtml(detail) + '</div>' +
+          '</div>';
+      }).join("");
+    }
+
+    function renderRecords(records) {
+      els.recordCount.textContent = records.length ? records.length + " 条" : "";
+      if (!records.length) {
+        els.recordList.innerHTML = '<div class="empty">近两周没有单独运动记录。</div>';
+        return;
+      }
+
+      els.recordList.innerHTML = records.map(function (record) {
+        return '<article class="record">' +
+          '<div class="record-top">' +
+            '<div class="record-title">' + escapeHtml(record.type) + '</div>' +
+            '<div class="record-meta">' + escapeHtml(record.label) + '</div>' +
+          '</div>' +
+          '<div class="record-stats">' +
+            '<div class="record-stat">时长<strong>' + escapeHtml(record.durationText) + '</strong></div>' +
+            '<div class="record-stat">距离<strong>' + escapeHtml(record.distanceText) + '</strong></div>' +
+            '<div class="record-stat">消耗<strong>' + escapeHtml(record.caloriesText) + '</strong></div>' +
+          '</div>' +
+          '</article>';
+      }).join("");
+    }
+
+    function render(data) {
+      const latest = data.latest;
+      const cls = toneClass(latest.status && latest.status.tone);
+      els.content.hidden = false;
+      els.rangeText.textContent = data.dateRange.label + " · " + data.totals.dayCount + " 天";
+      els.updatedText.textContent = formatDateTime(data.generatedAt);
+      els.statusDot.className = "dot " + cls;
+      els.statusTitle.textContent = latest.status.label;
+      els.statusDate.textContent = latest.date + (latest.partial ? " · 更新中" : "");
+      els.headline.textContent = latest.headline;
+      renderMetrics(latest.items || []);
+      renderAdvice(latest.advice || []);
+      renderRecentDays(data.recentDays || []);
+      renderRecords(data.activityRecords || []);
+    }
+
+    async function load() {
+      const token = getStoredToken();
+      if (!token) {
+        els.statusLine.textContent = "需要先保存 Token。";
+        els.content.hidden = true;
+        showTokenPanel(true);
+        return;
+      }
+
+      try {
+        setBusy(true);
+        els.statusLine.textContent = "正在读取最新数据...";
+        const data = await fetchHealthData(token);
+        render(data);
+        els.statusLine.textContent = "";
+        showTokenPanel(false);
+      } catch (error) {
+        els.content.hidden = true;
+        els.statusLine.textContent = "读取失败：" + error.message;
+        showTokenPanel(true);
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    els.tokenToggleButton.addEventListener("click", function () {
+      showTokenPanel(!els.tokenPanel.classList.contains("visible"));
+    });
+
+    els.refreshButton.addEventListener("click", load);
+
+    els.saveTokenButton.addEventListener("click", function () {
+      const token = els.tokenInput.value.trim();
+      if (token) {
+        localStorage.setItem(TOKEN_KEY, token);
+      }
+      load();
+    });
+
+    els.clearTokenButton.addEventListener("click", function () {
+      localStorage.removeItem(TOKEN_KEY);
+      els.tokenInput.value = "";
+      els.content.hidden = true;
+      els.statusLine.textContent = "Token 已清除。";
+      showTokenPanel(true);
+    });
+
+    load();
+  </script>
+</body>
+</html>
