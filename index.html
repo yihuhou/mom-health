@@ -402,10 +402,24 @@
       margin-bottom: 8px;
     }
 
+    .activity-heading {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      min-width: 0;
+    }
+
     .activity-title {
       font-size: 16px;
       font-weight: 780;
       line-height: 1.2;
+    }
+
+    .activity-time {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
     }
 
     .activity-type {
@@ -665,7 +679,6 @@
 
       const records = day.activities.map(function (activity) {
         const stats = [
-          ["时段", activity.timeText],
           ["时长", activity.durationText],
           ["距离", activity.distanceText],
           ["负荷", activity.trainingLoadText],
@@ -680,7 +693,10 @@
 
         return '<article class="activity-card">' +
           '<div class="activity-top">' +
-            '<div class="activity-title">' + escapeHtml(activity.title) + '</div>' +
+            '<div class="activity-heading">' +
+              '<div class="activity-title">' + escapeHtml(activity.title) + '</div>' +
+              '<div class="activity-time">' + escapeHtml(activity.timeText || "暂无时段") + '</div>' +
+            '</div>' +
             '<div class="activity-type">' + escapeHtml(activity.type) + '</div>' +
           '</div>' +
           '<div class="activity-grid">' + stats + '</div>' +
