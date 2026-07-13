@@ -665,6 +665,7 @@
 
       const records = day.activities.map(function (activity) {
         const stats = [
+          ["时段", activity.timeText],
           ["时长", activity.durationText],
           ["距离", activity.distanceText],
           ["负荷", activity.trainingLoadText],
