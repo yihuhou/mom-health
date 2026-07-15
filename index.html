@@ -381,6 +381,31 @@
       gap: 8px;
     }
 
+    .food-section {
+      display: grid;
+      gap: 8px;
+    }
+
+    .food-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .food-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      border: 1px solid #d8e4dc;
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: #f3f8f4;
+      color: #314d3d;
+      font-size: 13px;
+      font-weight: 740;
+      line-height: 1.2;
+    }
+
     .section-title {
       color: var(--muted);
       font-size: 13px;
@@ -672,6 +697,38 @@
         '</div>';
     }
 
+    const FOOD_CATEGORIES = {
+      staple: ["🍚", "主食"],
+      red_meat: ["🥩", "红肉"],
+      poultry: ["🍗", "禽肉"],
+      eggs: ["🥚", "蛋类"],
+      seafood: ["🐟", "水产"],
+      vegetables: ["🥬", "蔬菜"],
+      fruit: ["🍎", "水果"],
+      nuts_seeds: ["🌰", "坚果种子"],
+      dairy: ["🥛", "乳制品"],
+      soy: ["🫘", "豆制品"],
+      sweets: ["🍰", "零食甜品"],
+      beverages: ["🥤", "饮品"],
+      soup_porridge: ["🍲", "汤粥"]
+    };
+
+    function renderFood(day) {
+      const food = day.food || { status: "not_recorded", categories: [] };
+      const categories = Array.isArray(food.categories)
+        ? food.categories.filter(function (key) { return FOOD_CATEGORIES[key]; })
+        : [];
+      if (!categories.length) {
+        const text = food.status === "recorded" ? "🍽️ 饮食有记录，类别不详" : "🍽️ 饮食未记录";
+        return '<div class="food-section"><div class="section-title">饮食记录</div><div class="empty">' + text + '</div></div>';
+      }
+      const chips = categories.map(function (key) {
+        const category = FOOD_CATEGORIES[key];
+        return '<span class="food-chip">' + category[0] + ' ' + escapeHtml(category[1]) + '</span>';
+      }).join("");
+      return '<div class="food-section"><div class="section-title">饮食记录</div><div class="food-list">' + chips + '</div></div>';
+    }
+
     function renderActivities(day) {
       if (!day.activities || !day.activities.length) {
         return '<div class="activity-section"><div class="section-title">运动记录</div><div class="empty">这一天没有单独运动记录。</div></div>';
@@ -733,6 +790,7 @@
         '</div>' +
         '<div class="day-body">' +
           '<div class="metric-grid">' + metrics + '</div>' +
+          renderFood(day) +
           renderStages(day.sleep.stages) +
           renderActivities(day) +
         '</div>' +
