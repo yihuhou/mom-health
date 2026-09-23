@@ -3,539 +3,197 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>健康状态</title>
-  <style>
-    :root {
-      color-scheme: light;
-      --bg: #f6f7f6;
-      --panel: #ffffff;
-      --ink: #18232d;
-      --muted: #65717e;
-      --line: #dce3e7;
-      --soft: #f1f4f3;
-      --good: #2f8f68;
-      --steady: #3977a8;
-      --active: #d47a3c;
-      --warning: #bd594d;
-      --neutral: #7b8794;
-      --deep: #2e6f9f;
-      --light: #7eb6cc;
-      --rem: #8b73b7;
-      --awake: #d49a2d;
-      --shadow: 0 14px 34px rgba(24, 34, 43, 0.08);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-      line-height: 1.42;
-    }
-
-    .page {
-      width: min(880px, calc(100% - 24px));
-      margin: 0 auto;
-      padding: 20px 0 36px;
-    }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: flex-end;
-      margin-bottom: 12px;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 26px;
-      line-height: 1.12;
-      font-weight: 760;
-      letter-spacing: 0;
-    }
-
-    .subtle,
-    .meta {
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .actions {
-      display: flex;
-      gap: 8px;
-      justify-content: flex-end;
-      flex-wrap: wrap;
-    }
-
-    button,
-    input {
-      font: inherit;
-    }
-
-    button {
-      min-height: 34px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--panel);
-      color: var(--ink);
-      padding: 0 10px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    button.primary {
-      border-color: #1f6f54;
-      background: #1f6f54;
-      color: #fff;
-    }
-
-    button:disabled {
-      opacity: 0.55;
-      cursor: default;
-    }
-
-    .token-panel {
-      display: none;
-      margin-bottom: 12px;
-      padding: 12px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--panel);
-      box-shadow: var(--shadow);
-    }
-
-    .token-panel.visible {
-      display: block;
-    }
-
-    .token-row {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto auto;
-      gap: 8px;
-      margin-top: 9px;
-    }
-
-    input {
-      width: 100%;
-      min-height: 36px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 0 10px;
-      color: var(--ink);
-      background: #fff;
-    }
-
-    .status-line {
-      min-height: 20px;
-      margin: 6px 0 12px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .panel {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    .panel-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 12px;
-      padding: 15px 16px 0;
-    }
-
-    h2 {
-      margin: 0;
-      font-size: 18px;
-      font-weight: 760;
-      letter-spacing: 0;
-    }
-
-    .summary-strip {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 8px;
-      padding: 12px 16px 14px;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .summary-item {
-      min-height: 56px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 8px 10px;
-      background: #fbfcfc;
-    }
-
-    .summary-label,
-    .metric-label,
-    .activity-label {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .summary-value {
-      margin-top: 4px;
-      font-size: 17px;
-      line-height: 1.15;
-      font-weight: 760;
-    }
-
-    .day-list {
-      display: grid;
-      gap: 12px;
-      padding: 14px 16px 16px;
-    }
-
-    .day-card {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fbfcfc;
-      overflow: hidden;
-    }
-
-    .day-card.latest {
-      background: #fff;
-      border-color: #cdd8df;
-    }
-
-    .day-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      align-items: flex-start;
-      padding: 12px 12px 0;
-    }
-
-    .day-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .day-date {
-      font-size: 17px;
-      font-weight: 780;
-      line-height: 1.2;
-    }
-
-    .badge {
-      border-radius: 999px;
-      padding: 3px 8px;
-      color: #4d5965;
-      background: #e4e9ed;
-      font-size: 12px;
-      font-weight: 760;
-      white-space: nowrap;
-    }
-
-    .badge.good {
-      color: #226044;
-      background: #dcefe6;
-    }
-
-    .badge.steady {
-      color: #285b84;
-      background: #dfeaf3;
-    }
-
-    .badge.active {
-      color: #82481f;
-      background: #f1dccb;
-    }
-
-    .badge.warning {
-      color: #7d332d;
-      background: #f0d5d2;
-    }
-
-    .badge.period {
-      color: #7a3f5d;
-      background: #f1dce8;
-    }
-
-    .headline {
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .day-body {
-      padding: 12px;
-      display: grid;
-      gap: 10px;
-    }
-
-    .metric-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 8px;
-    }
-
-    .metric {
-      min-height: 72px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 9px;
-      background: #fff;
-    }
-
-    .metric-value {
-      margin-top: 4px;
-      font-size: 16px;
-      line-height: 1.18;
-      font-weight: 760;
-    }
-
-    .metric-note {
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .sleep-stage {
-      display: grid;
-      gap: 6px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 9px;
-      background: #fff;
-    }
-
-    .stage-bar {
-      display: flex;
-      height: 12px;
-      border-radius: 999px;
-      overflow: hidden;
-      background: var(--soft);
-    }
-
-    .stage-segment {
-      min-width: 2px;
-    }
-
-    .stage-segment.deep {
-      background: var(--deep);
-    }
-
-    .stage-segment.light {
-      background: var(--light);
-    }
-
-    .stage-segment.rem {
-      background: var(--rem);
-    }
-
-    .stage-segment.awake {
-      background: var(--awake);
-    }
-
-    .stage-legend {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px 12px;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .stage-dot {
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      border-radius: 3px;
-      margin-right: 5px;
-      vertical-align: 1px;
-      background: var(--neutral);
-    }
-
-    .stage-dot.deep {
-      background: var(--deep);
-    }
-
-    .stage-dot.light {
-      background: var(--light);
-    }
-
-    .stage-dot.rem {
-      background: var(--rem);
-    }
-
-    .stage-dot.awake {
-      background: var(--awake);
-    }
-
-    .activity-section {
-      display: grid;
-      gap: 8px;
-    }
-
-    .food-section {
-      display: grid;
-      gap: 8px;
-    }
-
-    .food-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-    }
-
-    .food-chip {
-      display: inline-flex;
-      align-items: center;
-      min-height: 34px;
-      border: 1px solid #d8e4dc;
-      border-radius: 999px;
-      padding: 6px 10px;
-      background: #f3f8f4;
-      color: #314d3d;
-      font-size: 13px;
-      font-weight: 740;
-      line-height: 1.2;
-    }
-
-    .section-title {
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 760;
-    }
-
-    .activity-card {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 10px;
-      background: #fff;
-    }
-
-    .activity-top {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 8px;
-    }
-
-    .activity-heading {
-      display: flex;
-      align-items: baseline;
-      gap: 10px;
-      min-width: 0;
-    }
-
-    .activity-title {
-      font-size: 16px;
-      font-weight: 780;
-      line-height: 1.2;
-    }
-
-    .activity-time {
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    .activity-type {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    .activity-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 7px;
-    }
-
-    .activity-stat {
-      min-height: 46px;
-      border-radius: 7px;
-      background: var(--soft);
-      padding: 7px;
-    }
-
-    .activity-value {
-      margin-top: 2px;
-      font-size: 14px;
-      font-weight: 760;
-      line-height: 1.18;
-    }
-
-    .empty {
-      color: var(--muted);
-      border-radius: 8px;
-      background: var(--soft);
-      padding: 10px;
-      font-size: 13px;
-    }
-
-    @media (max-width: 760px) {
-      .page {
-        width: min(100% - 20px, 620px);
-        padding-top: 16px;
-      }
-
-      header {
-        display: block;
-      }
-
-      .actions {
-        justify-content: flex-start;
-        margin-top: 10px;
-      }
-
-      .token-row,
-      .summary-strip,
-      .metric-grid,
-      .activity-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .day-top {
-        display: block;
-      }
-
-      .day-top .meta {
-        margin-top: 6px;
-      }
-
-      h1 {
-        font-size: 24px;
-      }
-    }
-
-    @media (max-width: 460px) {
-      .summary-strip,
-      .metric-grid,
-      .activity-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+  <title>健康状态 · 每日记录</title>
+  <style>:root {
+  color-scheme: light;
+  --canvas: #f8f7f3;
+  --paper: #fffefa;
+  --ink: #23372f;
+  --muted: #728077;
+  --line: #e4e7df;
+  --sage: #dbe8db;
+  --green: #2f6653;
+  --deep: #557c9c;
+  --light: #a2c5d2;
+  --rem: #9a8cb6;
+  --awake: #d4aa70;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  color: var(--ink);
+  background: var(--canvas);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+button, input { font: inherit; }
+button {
+  min-height: 38px;
+  padding: 0 15px;
+  border: 1px solid #d9e1d8;
+  border-radius: 999px;
+  color: var(--green);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+button:hover:not(:disabled) { border-color: #9ab8a3; background: #eef3ec; }
+button:disabled { opacity: .5; cursor: default; }
+button:focus-visible, input:focus-visible, summary:focus-visible { outline: 3px solid #94bea1; outline-offset: 3px; }
+button.primary { border-color: var(--green); color: #fff; background: var(--green); }
+button.primary:hover:not(:disabled) { background: #245442; }
+
+.page { width: min(1060px, calc(100% - 48px)); margin: 0 auto; padding: 27px 0 76px; }
+header { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; padding-bottom: 28px; border-bottom: 1px solid #dfe5db; }
+header > div:first-child { display: grid; grid-template-columns: 38px auto; column-gap: 13px; align-items: center; }
+.brand-mark { display: grid; grid-row: 1 / 3; place-items: center; width: 38px; height: 38px; border-radius: 12px; color: #fff; background: var(--green); font-size: 21px; font-weight: 600; line-height: 1; }
+.eyebrow { color: var(--green); font-size: 11px; font-weight: 800; letter-spacing: .1em; }
+header .eyebrow { align-self: end; letter-spacing: .04em; }
+h1 { margin: 0; font-size: 27px; line-height: 1.15; font-weight: 780; letter-spacing: -.035em; }
+.subtle, .meta { color: var(--muted); font-size: 13px; }
+header .subtle { grid-column: 2; margin-top: 7px; }
+.actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; padding-top: 6px; }
+.actions button:first-child { border-color: var(--green); color: #fff; background: var(--green); }
+.actions button:first-child:hover:not(:disabled) { background: #245442; }
+
+.token-panel { display: none; margin-top: 18px; padding: 19px 21px; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); }
+.token-panel.visible { display: block; }
+.token-row { display: grid; grid-template-columns: minmax(0,1fr) auto auto; gap: 9px; margin-top: 13px; }
+input { width: 100%; min-width: 0; min-height: 40px; padding: 0 13px; border: 1px solid #d2dcd1; border-radius: 9px; color: var(--ink); background: #fff; }
+.status-line { margin-top: 18px; padding: 11px 14px; border: 1px solid #e7dcc7; border-radius: 10px; color: #76613f; background: #fff9e9; font-size: 13px; }
+.status-line:empty { display: none; }
+
+.panel { margin-top: 32px; }
+.panel-head, .timeline-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; }
+.panel-head { margin-bottom: 15px; }
+.panel-head .eyebrow { margin-bottom: 4px; }
+h2 { margin: 0; font-size: 20px; line-height: 1.3; font-weight: 780; letter-spacing: -.025em; }
+.panel-head .meta { padding-bottom: 2px; }
+.summary-strip { display: grid; grid-template-columns: 1.6fr repeat(3, 1fr); gap: 10px; }
+.summary-item { display: flex; flex-direction: column; justify-content: space-between; min-width: 0; min-height: 170px; padding: 22px 21px; border: 1px solid var(--line); border-radius: 16px; background: var(--paper); }
+.summary-item:first-child { position: relative; overflow: hidden; border-color: #315e4c; color: #fff; background: #315e4c; }
+.summary-item:first-child::after { position: absolute; right: -56px; bottom: -110px; width: 235px; height: 235px; border: 1px solid rgba(255,255,255,.23); border-radius: 50%; box-shadow: 0 0 0 34px rgba(255,255,255,.04), 0 0 0 78px rgba(255,255,255,.035); content: ""; pointer-events: none; }
+.summary-label { color: var(--muted); font-size: 13px; font-weight: 700; }
+.summary-item:first-child .summary-label { color: #dcece0; }
+.summary-value { position: relative; z-index: 1; margin-top: 8px; font-size: clamp(22px, 2.8vw, 28px); line-height: 1.18; font-weight: 780; letter-spacing: -.025em; overflow-wrap: anywhere; }
+.summary-item:first-child .summary-value { font-size: clamp(30px, 3.3vw, 40px); }
+.summary-foot { position: relative; z-index: 1; color: #d6e8d8; font-size: 12px; }
+.summary-item:not(:first-child)::after { display: block; width: 25px; height: 3px; margin-top: 15px; border-radius: 3px; background: #9dbca2; content: ""; }
+.summary-item:nth-child(3)::after { background: #d6aa7b; }
+.summary-item:nth-child(4)::after { background: #ad9bbb; }
+
+.timeline-head { margin: 40px 0 16px; }
+.timeline-head .meta { padding-bottom: 3px; }
+.day-list { display: grid; gap: 10px; }
+.day-card { min-width: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); }
+.day-card.latest { border-color: #b9d0bd; }
+.day-top { display: flex; justify-content: space-between; align-items: center; gap: 18px; min-height: 106px; padding: 20px 23px; list-style: none; cursor: pointer; }
+.day-top::-webkit-details-marker { display: none; }
+.day-top:hover { background: #fbfcf8; }
+.day-card[open] > .day-top { background: #f2f7f0; }
+.day-main { min-width: 0; }
+.day-title { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; }
+.day-date { font-size: 19px; line-height: 1.25; font-weight: 780; }
+.headline { margin-top: 7px; color: #617268; font-size: 13px; }
+.badge { display: inline-flex; align-items: center; gap: 6px; min-height: 25px; padding: 2px 10px; border-radius: 999px; color: #5a665d; background: #edf0e9; font-size: 12px; font-weight: 750; white-space: nowrap; }
+.badge::before { width: 6px; height: 6px; border-radius: 50%; background: currentColor; content: ""; }
+.badge.good { color: #317455; background: #e0eee1; }
+.badge.steady { color: #456b86; background: #e5eff4; }
+.badge.active { color: #9a6b3e; background: #f7ead9; }
+.badge.warning { color: #a25b50; background: #f8e6df; }
+.badge.period { color: #8c5974; background: #f5e7ed; }
+.day-side { display: flex; align-items: center; gap: 21px; flex-shrink: 0; }
+.day-quick { display: flex; gap: 24px; }
+.day-quick span { display: grid; gap: 3px; }
+.day-quick small { color: var(--muted); font-size: 11px; font-weight: 700; }
+.day-quick b { font-size: 14px; font-weight: 760; white-space: nowrap; }
+.day-card[open] .day-quick { display: none; }
+.chevron { display: block; width: 9px; height: 9px; border-right: 2px solid #789081; border-bottom: 2px solid #789081; transform: rotate(45deg); transition: transform 160ms ease; }
+.day-card[open] .chevron { transform: rotate(225deg); }
+.day-body { display: grid; gap: 23px; padding: 22px 23px 25px; border-top: 1px solid #e6ece2; }
+.metric-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 1px; overflow: hidden; border: 1px solid #e5e9e2; border-radius: 11px; background: #e5e9e2; }
+.metric { min-width: 0; min-height: 112px; padding: 15px 16px; background: #fafbf7; }
+.metric-label, .activity-label { color: var(--muted); font-size: 11px; font-weight: 700; }
+.metric-value { margin-top: 7px; font-size: 18px; line-height: 1.22; font-weight: 780; overflow-wrap: anywhere; }
+.metric-note { margin-top: 6px; color: var(--muted); font-size: 11px; line-height: 1.45; overflow-wrap: anywhere; }
+.food-section, .activity-section { display: grid; gap: 10px; }
+.section-title { color: #456353; font-size: 13px; font-weight: 780; }
+.food-list { display: flex; flex-wrap: wrap; gap: 7px; }
+.food-chip { display: inline-flex; align-items: center; min-height: 32px; padding: 5px 10px; border: 1px solid #dfe9dd; border-radius: 999px; color: #42604c; background: #f6faf4; font-size: 12px; font-weight: 700; }
+.sleep-stage { display: grid; gap: 10px; }
+.stage-bar { display: flex; height: 9px; overflow: hidden; border-radius: 999px; background: #e4e9e2; }
+.stage-segment { min-width: 2px; }
+.stage-segment.deep, .stage-dot.deep { background: var(--deep); }
+.stage-segment.light, .stage-dot.light { background: var(--light); }
+.stage-segment.rem, .stage-dot.rem { background: var(--rem); }
+.stage-segment.awake, .stage-dot.awake { background: var(--awake); }
+.stage-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; color: var(--muted); font-size: 12px; }
+.stage-dot { display: inline-block; width: 8px; height: 8px; margin-right: 5px; border-radius: 50%; vertical-align: 1px; background: #9ca7a0; }
+.activity-card { padding: 15px 17px; border: 1px solid var(--line); border-radius: 11px; }
+.activity-top { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; padding-bottom: 12px; border-bottom: 1px solid #e9ece5; }
+.activity-heading { display: flex; align-items: baseline; flex-wrap: wrap; gap: 3px 11px; min-width: 0; }
+.activity-title { font-size: 15px; font-weight: 780; overflow-wrap: anywhere; }
+.activity-time, .activity-type { color: var(--muted); font-size: 12px; font-weight: 700; }
+.activity-type { white-space: nowrap; }
+.activity-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 13px 12px; padding-top: 13px; }
+.activity-stat { min-width: 0; }
+.activity-value { margin-top: 3px; font-size: 13px; line-height: 1.3; font-weight: 750; overflow-wrap: anywhere; }
+.empty { padding: 11px 13px; border-radius: 8px; color: var(--muted); background: #f5f7f1; font-size: 13px; }
+
+@media (max-width: 760px) {
+  .page { width: min(100% - 28px, 600px); padding: 19px 0 48px; }
+  header { align-items: flex-start; }
+  .summary-strip { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .summary-item:first-child { grid-column: 1 / -1; min-height: 160px; }
+  .summary-item { min-height: 132px; }
+  .summary-item:nth-child(4) { grid-column: 1 / -1; min-height: 105px; }
+  .metric-grid, .activity-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .day-quick { gap: 13px; }
+}
+
+@media (max-width: 500px) {
+  .page { width: calc(100% - 22px); }
+  header { display: block; padding-bottom: 21px; }
+  .actions { justify-content: flex-start; margin-top: 17px; padding: 0 0 0 51px; }
+  .panel { margin-top: 26px; }
+  .summary-strip { gap: 8px; }
+  .summary-item { padding: 17px; border-radius: 13px; }
+  .summary-item:first-child { min-height: 150px; }
+  .summary-item:not(:first-child) .summary-value { font-size: 21px; }
+  .timeline-head { margin-top: 32px; }
+  .day-top { min-height: 98px; padding: 17px; }
+  .day-date { font-size: 17px; }
+  .headline { font-size: 12px; }
+  .day-quick { display: none; }
+  .day-side { gap: 0; }
+  .day-body { gap: 20px; padding: 17px; }
+  .metric { min-height: 112px; padding: 12px; }
+  .metric-value { font-size: 16px; }
+  .token-row { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .token-row input { grid-column: 1 / -1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button, .chevron { transition: none; }
+}
+</style>
 </head>
 <body>
   <main class="page">
     <header>
       <div>
+        <span class="brand-mark" aria-hidden="true">♡</span>
+        <div class="eyebrow">每日健康记录</div>
         <h1>健康状态</h1>
         <div class="subtle" id="rangeText">每天早晨更新</div>
       </div>
       <div class="actions">
         <button id="refreshButton" type="button">重新读取</button>
-        <button id="tokenToggleButton" type="button">Token</button>
+        <button id="tokenToggleButton" type="button" aria-controls="tokenPanel" aria-expanded="false">访问设置</button>
       </div>
     </header>
 
@@ -548,14 +206,21 @@
       </div>
     </section>
 
-    <div class="status-line" id="statusLine"></div>
+    <div class="status-line" id="statusLine" role="status" aria-live="polite"></div>
 
     <section class="panel" id="content" aria-label="每日状态" hidden>
       <div class="panel-head">
-        <h2>每日状态</h2>
+        <div>
+          <div class="eyebrow">这段时间</div>
+          <h2>近况一览</h2>
+        </div>
         <div class="meta" id="updatedText"></div>
       </div>
       <div class="summary-strip" id="summaryStrip"></div>
+      <div class="timeline-head">
+        <h2>每日记录</h2>
+        <div class="meta">点开日期查看详情</div>
+      </div>
       <div class="day-list" id="dayList"></div>
     </section>
   </main>
@@ -619,6 +284,7 @@
 
     function showTokenPanel(show) {
       els.tokenPanel.classList.toggle("visible", show);
+      els.tokenToggleButton.setAttribute("aria-expanded", String(show));
       if (show) {
         els.tokenInput.value = getStoredToken();
         window.setTimeout(function () { els.tokenInput.focus(); }, 0);
@@ -658,10 +324,11 @@
         ["运动时间", totals.exerciseText],
         ["运动记录", (totals.activityCount || 0) + " 条"]
       ];
-      els.summaryStrip.innerHTML = items.map(function (item) {
+      els.summaryStrip.innerHTML = items.map(function (item, index) {
         return '<div class="summary-item">' +
           '<div class="summary-label">' + escapeHtml(item[0]) + '</div>' +
           '<div class="summary-value">' + escapeHtml(item[1] || "暂无") + '</div>' +
+          (index === 0 ? '<div class="summary-foot">最近 ' + escapeHtml((data.days || []).length) + ' 天的记录</div>' : '') +
           '</div>';
       }).join("");
     }
@@ -776,9 +443,9 @@
         renderMetric("日间活动", day.activity.stepsText, day.activity.exerciseText + " · " + day.activity.activeCaloriesText)
       ].join("");
 
-      return '<article class="day-card' + latestClass + '">' +
-        '<div class="day-top">' +
-          '<div>' +
+      return '<details class="day-card' + latestClass + '"' + (index === 0 ? ' open' : '') + '>' +
+        '<summary class="day-top">' +
+          '<div class="day-main">' +
             '<div class="day-title">' +
               '<span class="day-date">' + escapeHtml(day.label) + '</span>' +
               '<span class="badge ' + cls + '">' + escapeHtml(day.status.label) + '</span>' +
@@ -786,15 +453,21 @@
             '</div>' +
             '<div class="headline">' + escapeHtml(day.status.headline) + '</div>' +
           '</div>' +
-          '<div class="meta">' + escapeHtml(day.date) + '</div>' +
-        '</div>' +
+          '<div class="day-side">' +
+            '<div class="day-quick">' +
+              '<span><small>睡眠</small><b>' + escapeHtml(day.sleep.durationText) + '</b></span>' +
+              '<span><small>步数</small><b>' + escapeHtml(day.activity.stepsText) + '</b></span>' +
+            '</div>' +
+            '<span class="chevron" aria-hidden="true"></span>' +
+          '</div>' +
+        '</summary>' +
         '<div class="day-body">' +
           '<div class="metric-grid">' + metrics + '</div>' +
           renderFood(day) +
           renderStages(day.sleep.stages) +
           renderActivities(day) +
         '</div>' +
-        '</article>';
+        '</details>';
     }
 
     function render(data) {
